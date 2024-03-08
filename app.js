@@ -43,7 +43,7 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     minlength: 6,
-    required: [true, "Provide a password"],
+    required: false,
   },
 });
 
@@ -88,10 +88,10 @@ app.get("/google/callback", async (req, res) => {
   );
   const token_info_data = await token_info_response.json();
 
-  const { email, name, at_hash: password } = token_info_data;
+  const { email, name } = token_info_data;
   let user = await User.findOne({ email }).select("-password");
   if (!user) {
-    user = await User.create({ email, name, password }).select("-password");
+    user = await User.create({ email, name });
   }
   const token = user.generateToken();
   res.status(token_info_response.status).json({ user, token });
